@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pg-compact"
+version = "0.1.0"
+description = "Zero-lock online table and TOAST bloat compaction tool for PostgreSQL"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "sirmax" }]
+requires-python = ">=3.9"
+keywords = ["postgresql", "postgres", "bloat", "vacuum", "database", "maintenance"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Database",
+    "Topic :: System :: Systems Administration",
+]
+dependencies = [
+    "psycopg[binary]>=3.1,<4",
+]
+
+[project.optional-dependencies]
+ui = [
+    "rich>=13",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-timeout>=2.3",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "build>=1.2",
+    "rich>=13",
+]
+
+[project.urls]
+Homepage = "https://github.com/sirmax/pg-compact"
+Issues = "https://github.com/sirmax/pg-compact/issues"
+
+[project.scripts]
+pg-compact = "pg_compact.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 125
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src"]
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
