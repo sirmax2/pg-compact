@@ -254,7 +254,7 @@ def _compact_relation(
 
     # Scale the VACUUM cadence to the relation.  The module constant is
     # tuned for very large tables; on small relations it would exceed the
-    # whole reclaimable range, so a single final VACUUM does the job.
+    # whole reclaimable range, so a single trailing VACUUM does the job.
     vacuum_every = max(1, min(_VACUUM_EVERY_PAGES, reclaimable_pages))
 
     # Cursor walks down from the physical tail toward ideal_pages.  Pages
@@ -564,11 +564,13 @@ def _compact_relation(
                             f"{target.phase_name}: no landing space left ahead of tail; stopping.")
                         break
 
-            # Final VACUUM to truncate whatever dead tail remains.
+            # Truncate whatever dead tail the loop left behind. Same wording as
+            # the in-loop VACUUM: "final" is reserved for the end-of-run
+            # "Running final VACUUM..." after every phase.
             if cleared_since_vacuum > 0:
                 before_vac, after_vac = _do_vacuum()
                 log("info",
-                    f"{target.phase_name}: final VACUUM truncated {before_vac - after_vac} pages "
+                    f"{target.phase_name}: VACUUM truncated {before_vac - after_vac} pages "
                     f"({before_vac} -> {after_vac}).")
         except psycopg.errors.QueryCanceled:
             conn.rollback()
