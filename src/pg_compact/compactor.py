@@ -1127,6 +1127,7 @@ def compact_table(
             log("notice", f"Heap: can free now < {config.min_compact_percent:.0f}%; skipping heap phase.")
 
         # --- TOAST compaction ---
+        toast_outcome = Outcome.COMPLETED
         if config.toast_compact:
             from pg_compact.toast import get_toastable_columns
 
@@ -1166,14 +1167,9 @@ def compact_table(
                     finally:
                         db.reset_replication_role(conn)
                 elif toast_bloat is not None:
-                    toast_outcome = Outcome.COMPLETED
                     log("notice",
                         f"TOAST: free {toast_bloat.free_percent:.1f}% < "
                         f"{config.min_compact_percent:.0f}%; skipping TOAST rewrite.")
-                else:
-                    toast_outcome = Outcome.COMPLETED
-        else:
-            toast_outcome = Outcome.COMPLETED
 
         # Overall outcome: COMPLETED if either phase made progress.
         if heap_outcome == Outcome.COMPLETED or toast_outcome == Outcome.COMPLETED:
